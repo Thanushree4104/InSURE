@@ -127,68 +127,78 @@ Design a **risk-adjusted, automated weekly premium system** that:
 
 ## 🧠 Core Pricing Function
 
-`P_w = B * (1 + R_w) * (1 - I_w) + C + γ * F_w`
+## Risk Score Formulation
+
+The risk score is computed as a **weighted aggregation of key environmental and operational factors**:
+
+`R_w = 0.25R + 0.15H + 0.10A + 0.20O + 0.15C`
 
 ---
 
-## 🔍 Variables
+### Variables
 
-| Symbol | Description                 |
-| ------ | --------------------------- |
-| P_w    | Weekly Premium              |
-| B      | Base Premium                |
-| R_w    | Risk Score (ML output, 0–1) |
-| I_w    | Incentive Factor (0–0.3)    |
-| C      | Operational Cost + Margin   |
-| F_w    | Fraud Risk Score (0–1)      |
-| γ      | Fraud penalty weight        |
+| Symbol | Description                    |
+| ------ | ------------------------------ |
+| R      | Rainfall trigger score         |
+| H      | Heat index score               |
+| A      | Air Quality Index (AQI) score  |
+| O      | Platform outage duration score |
+| C      | Order cancellation rate        |
 
 ---
 
-## ⚙️ Risk Scoring (ML Layer)
+### Feature Normalization
 
-`R_w = ML_Model(features)`
+Each variable is normalized to a 0–1 scale:
 
-* Model: **Gradient Boosting (XGBoost / LightGBM)**
-* Output: Probability of payout-trigger events
-Gradient Boosting models (XGBoost / LightGBM) are chosen for their superior performance on structured/tabular data, capturing complex non-linear relationships between risk factors. They provide high predictive accuracy with built-in handling of feature interactions and missing data. Additionally, they offer fast inference and feature importance interpretability, making them suitable for real-time, explainable pricing systems.
----
+* **Rainfall (R)**
+  `R = Actual Rainfall / Threshold Rainfall`
 
-## 🎯 Incentive Function (Behavior Optimization)
+* **Heat Index (H)**
+  `H = (Temp - T_safe) / (T_max - T_safe)`
 
-`I_w = α * H_p + β * S_c`
+* **Outage (O)**
+  `O = Outage Hours / 24`
 
-| Symbol | Description                   |
-| ------ | ----------------------------- |
-| H_p    | Peak-hour participation ratio |
-| S_c    | Earnings stability score      |
-| α, β   | Weight parameters             |
-
-> Encourages workers to operate in **high-demand, stable conditions**
+* **Cancellation Rate (C)**
+  `C = Cancelled Orders / Total Orders`
 
 ---
 
-## 💸 Profitability Constraint
+## Premium Calculation
 
-`P_w >= Expected_Loss + Margin`
-
-`Expected_Loss = p_w * A_w`
-
-| Term   | Description                           |
-| ------ | ------------------------------------- |
-| p_w    | Probability of trigger (ML predicted) |
-| A_w    | Expected payout                       |
-| Margin | Platform profit buffer                |
+`P_w = P_base * (1 + α * R_w)`
 
 ---
 
-## ⚡ Real-Time Adjustment
+### Parameters
 
-`P_w' = P_w * (1 + δ_t)`
+| Symbol | Description                    |
+| ------ | ------------------------------ |
+| P_base | Fixed weekly base (₹50 – ₹100) |
+| α      | Sensitivity factor (0.5 – 1.5) |
 
-* δ_t → Short-term risk spike
-  (rain, outages, demand shocks)
+---
 
+### Interpretation
+
+* Higher **risk score → higher premium**
+* α controls how aggressively pricing reacts to risk
+
+> Recommended: `α ≈ 0.7` for balanced responsiveness
+
+α is learned from historical data (rainfall, AQI, outages, cancellations, income loss) to align premiums with real-world risk.
+
+α = Observed Loss / (P_base * R_w) ensures pricing is data-calibrated and adaptive
+
+---
+
+## Key Advantages
+
+* Simple and explainable (no black-box dependency)
+* Uses real-time, measurable signals
+* Weighted based on impact severity
+* Easily adaptable across cities
 ---
 
 ## 🛡️ Fraud Integration
@@ -632,5 +642,93 @@ ShieldRide ensures **fraud detection without harming genuine users**.
 
 ---
 ## Tech Stack
+.
+.
+.
+.
+.
+.
+.
+.
+.
+## 🏦 Platform Stability Mechanism
+
+To ensure financial sustainability, ShieldRide maintains a dynamic **Capital Adequacy Ratio (CAR)**:
+
+`CAR = PoolCapital / TotalExpectedLoss`
+
+---
+
+### ⚙️ Logic
+
+* If `CAR < threshold` → ⬆️ Slight premium increase
+* If `CAR ≥ threshold` → ✅ Keep pricing stable
+
+---
+
+### 🧠 Implementation
+
+* Tracked in database:
+
+  * Pool capital balance
+  * Historical payouts
+
+> Acts as a **mini insurance balance sheet**, ensuring liquidity and preventing fund depletion.
+
+---
+
+
+## ⚖️ Parameter Selection & Model Scope
+
+---
+
+### 🧩 Excluded High-Uncertainty Factors
+
+Certain macro-level risks such as:
+
+* War / geopolitical disruptions
+* Pandemic-scale events
+
+were evaluated but **excluded from the premium calculation**.
+
+**Reason:**
+
+* Highly unpredictable and non-localized
+* Difficult to model with short-term, real-time data
+* Introduces instability in weekly pricing
+
+> These are better handled via **separate catastrophic risk layers**, not core pricing.
+
+---
+
+### ⚙️ Weighted Parameter Strategy
+
+The model prioritizes **high-frequency, localized, and measurable signals** over indirect or platform-dependent factors.
+
+---
+
+### 📊 Higher-Weight Parameters
+
+* 🌡️ Heat index
+* 🌧️ Rainfall intensity
+* 🌫️ Air Quality Index (AQI)
+* 📉 Real-time demand volatility
+
+> Directly impact worker productivity and income disruption
+
+---
+
+### 📉 Lower-Weight Parameters
+
+* Dark store availability
+* Platform stability / minor outages
+
+> While relevant, these are:
+
+* Less frequent
+* Platform-controlled
+* Lower impact compared to environmental risks
+
+---
 
 
