@@ -594,7 +594,7 @@ ShieldRide ensures **fraud detection without harming genuine users**.
 ---
 
 1. **Onboarding & Consent**
-   User signs up, links platform account, and grants data access.
+   User signs up, links platform account, and grants data access anf least priviledge access.
 
 2. **Data Ingestion**
    Real-time data collected from platform APIs, device signals, and external sources (weather, demand).
@@ -631,5 +631,6 @@ ShieldRide ensures **fraud detection without harming genuine users**.
     Dashboard updates with insights, risk score, and next-week premium.
 
 ---
+## Tech Stack
 
 
