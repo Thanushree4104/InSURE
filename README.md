@@ -1,5 +1,5 @@
 # 🚀 ShieldRide  
-### Real-Time Income Stabilization Engine for Gig Delivery Workers
+### Real-Time Insurance Stabilization Engine for Gig Delivery Workers
 
 ---
 
